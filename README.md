@@ -9,8 +9,6 @@ Please see the FirstBuild website for all the details about this project @ https
 Using the easy to use Arduino state machine @ http://playground.arduino.cc/Code/FiniteStateMachine
 
 
-### Code block
-
 <pre>
 	
 
