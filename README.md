@@ -72,4 +72,10 @@ Using the easy to use Arduino state machine @ http://playground.arduino.cc/Code/
 
 </pre>
 
+### Fuse settings for ATTINY85
+low_fuses=0xe2
+
+high_fuses=0xdf
+
+extended_fuses=0xff
 
