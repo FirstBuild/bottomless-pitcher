@@ -8,6 +8,11 @@ Please see the FirstBuild website for all the details about this project @ https
 #### State Machine
 Using the easy to use Arduino state machine @ http://playground.arduino.cc/Code/FiniteStateMachine
 
+
+### Code block
+
+<pre>
+
                                                    level switch activated                  
                            +--------------------+                                          
                            |                    +---------------------------------+        
@@ -39,7 +44,7 @@ Using the easy to use Arduino state machine @ http://playground.arduino.cc/Code/
      +---------------------+                                  +---------------------+      
                                                                                            
                                                                                            
-
+</pre>
 
 #### Electronics
 The project is based on the ATtiny85 chip. All of the schematics can be found on upverter @ https://upverter.com/Triode/f7179c67e7e12ec7/Bottomless-Pitcher-Controller-Board/
