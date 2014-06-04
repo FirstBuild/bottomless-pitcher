@@ -1,3 +1,24 @@
+/*
+* Copyright (c) 2014 FirstBuild
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
+
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+* THE SOFTWARE.
+*/
 
 /**********************************************************
 This is example code for using the Adafruit liquid flow meters. 
@@ -20,26 +41,31 @@ All text above must be included in any redistribution
 **********************************************************/
 
 #include <FiniteStateMachine.h>
+//#include <SimpleTimer.h>
 
-const uint8_t STANDBY_AY = 10000;
-
-const int FILLREED = 2;
-const int RELAYOUT = 3;
-const int PROXREED  = 4;
-const byte NUMBER_OF_STATES = 3; //how many states are we cycling through?
+#define MAX_FILL_TIME 180000
  
+//state machine setup 
 State stateFilling = State(stateFillingEnter, stateFillingUpdate, stateFillingExit);
 State stateComplete = State(stateCompleteEnter, stateCompleteUpdate, stateCompleteExit);
 State stateStandby = State(stateStandbyEnter, stateStandbyUpdate, stateStandbyExit);
- 
 FSM bpStateMachine = FSM(stateComplete);     //initialize state machine, start in state: On
+//SimpleTimer timerFillExpire;
+//int tickEvent;
 
-#define FLOWSENSORPIN 7
+static const uint8_t FILLREED = 1;
+static const uint8_t RELAYOUT = 2;
+static const uint8_t PROXREED  = 4;
+static const uint8_t NUMBER_OF_STATES = 3; //how many states are we cycling through?
+static const uint8_t FLOWSENSORPIN  = 0;
+static const uint8_t PITCHER_CONNECTED = LOW;
+static const uint8_t PITCHER_AWAY =  HIGH;
+static const uint8_t PITCHER_FILLING  = HIGH;
+static const uint8_t PITCHER_FULL  = LOW;
+static const uint16_t WAIT_TIME_BETWEEEN_FILLS = 5000;
 
-#define PITCHER_CONNECTED LOW
-#define PITCHER_AWAY HIGH
-#define PITCHER_FILLING HIGH
-#define PITCHER_FULL LOW
+unsigned long start_filling_millis = 0;
+
 
 // count how many pulses!
 volatile uint16_t pulses = 0;
@@ -61,12 +87,12 @@ void setup() {
   pinMode(FLOWSENSORPIN, INPUT);
   digitalWrite(FLOWSENSORPIN, HIGH);
   lastflowpinstate = digitalRead(FLOWSENSORPIN);
+  
   useInterrupt(true);
-
+  
 }
 
 void loop(){
-
   
   bpStateMachine.update();
 }
@@ -76,34 +102,45 @@ void loop(){
 //------------------------------------------
 void stateFillingEnter()
 { 
-  //Serial.println("state filling enter");
-  delay(5000);
+  delay(WAIT_TIME_BETWEEEN_FILLS);
   digitalWrite(RELAYOUT, HIGH);
+  pulses = 0;
+  lastpulses = 0;
+  start_filling_millis = millis();
+  //timerFillExpire.restartTimer(tickEvent);
+  //tickEvent = timerFillExpire.after(MAX_FILL_TIME, fillTimerExpire); 
+  //tickEvent = timerFillExpire.setTimeout(90 * 1000, fillTimerExpire);
 }
+
+//void fillTimerExpire()
+//{
+//  bpStateMachine.transitionTo(stateComplete);
+//}
 
 void stateFillingUpdate()
 { 
+  //timerFillExpire.run();
   
+  unsigned long current_millis = millis();
+  
+  //timerFillExpire.update();
   if (PITCHER_AWAY==digitalRead(PROXREED))
   {
     //if the proximity switch is not set, bail
-    //Serial.println("proximity switch deactivated");
     bpStateMachine.transitionTo(stateComplete); 
   }
   else if (PITCHER_FULL==digitalRead(FILLREED))
   {
-    //Serial.println("fill switch activated");  
     bpStateMachine.transitionTo(stateComplete);   
   }
-  //todo: global timeout
+  else if (current_millis - start_filling_millis > MAX_FILL_TIME)
+  {
+    bpStateMachine.transitionTo(stateComplete); 
+  }
   else
   {
-    //Serial.println(".");
     if (lastpulses != pulses) 
     {
-      //Serial.print("Freq: "); Serial.println(flowrate);
-      //Serial.print("Pulses: "); Serial.println(pulses, DEC);
-      
       // if a plastic sensor use the following calculation
       // Sensor Frequency (Hz) = 7.5 * Q (Liters/min)
       // Liters = Q * time elapsed (seconds) / 60 (seconds/minute)
@@ -121,18 +158,15 @@ void stateFillingUpdate()
         //Serial.println("too many ounces!!");  
         bpStateMachine.transitionTo(stateComplete);
       }
-      //lcd.setCursor(0, 1);
-      //lcd.print(liters); lcd.print(" Liters        ");
     }
-  
     delay(100);
   }
 }
 
 void stateFillingExit()
 { 
-  //Serial.println("\nstate filling exit");
   digitalWrite(RELAYOUT, LOW);
+  //timerFillExpire.deleteTimer(tickEvent);
 }
 
 
@@ -141,10 +175,6 @@ void stateFillingExit()
 //------------------------------------------
 void stateCompleteEnter()
 { 
-//  Serial.print("state complete enter\t");
-//  Serial.print(digitalRead(PROXREED));
-//  Serial.print(digitalRead(FILLREED));
-//  Serial.println(LOW);
 }
 
 void stateCompleteUpdate()
@@ -159,7 +189,6 @@ void stateCompleteUpdate()
 
 void stateCompleteExit()
 { 
-  //Serial.println("state complete exit");
 }
 
 
@@ -168,7 +197,6 @@ void stateCompleteExit()
 //------------------------------------------
 void stateStandbyEnter()
 { 
-  //Serial.println("state standby enter"); 
 }
 
 void stateStandbyUpdate()
@@ -182,7 +210,6 @@ void stateStandbyUpdate()
 
 void stateStandbyExit()
 { 
-  //Serial.println("state standby exit"); 
 }
 
 SIGNAL(TIMER0_COMPA_vect) 
@@ -209,13 +236,13 @@ SIGNAL(TIMER0_COMPA_vect)
 
 void useInterrupt(boolean v) {
   if (v) {
-    // Timer0 is already used for millis() - we'll just interrupt somewhere
+    // Timer is already used for millis() - we'll just interrupt somewhere
     // in the middle and call the "Compare A" function above
     OCR0A = 0xAF;
-    TIMSK0 |= _BV(OCIE0A);
+    TIMSK |= _BV(OCIE0A);
   } else {
     // do not call the interrupt function COMPA anymore
-    TIMSK0 &= ~_BV(OCIE0A);
+    TIMSK &= ~_BV(OCIE0A);
   }
 }
 
