@@ -13,7 +13,7 @@ Using the easy to use Arduino state machine @ http://playground.arduino.cc/Code/
 
 
 
-
+<pre>
 	
 
                                                    level switch activated                  
@@ -39,7 +39,7 @@ Using the easy to use Arduino state machine @ http://playground.arduino.cc/Code/
      |                     |                                  |                     |      
      |                     |                                  |                     |      
      |      standby        |                                  |     complete        |      
-     |                     | <------------------------------+ |                     |      
+     |                     | &lt;------------------------------+ |                     |      
      |                     |        prox switch &             |                     |      
      |                     |        level switch deactivated  |                     |      
      |                     |                                  |                     |      
