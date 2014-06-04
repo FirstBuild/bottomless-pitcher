@@ -13,7 +13,7 @@ Using the easy to use Arduino state machine @ http://playground.arduino.cc/Code/
 
 
 
-<pre>
+
 	
 
                                                    level switch activated                  
