@@ -49,6 +49,8 @@ State stateFilling = State(stateFillingEnter, stateFillingUpdate, stateFillingEx
 State stateComplete = State(stateCompleteEnter, stateCompleteUpdate, stateCompleteExit);
 State stateStandby = State(stateStandbyEnter, stateStandbyUpdate, stateStandbyExit);
 FSM bpStateMachine = FSM(stateComplete);     //initialize state machine, start in state: On
+//SimpleTimer timerFillExpire;
+//int tickEvent;
 
 static const uint8_t FILLREED = 1;
 static const uint8_t RELAYOUT = 2;
@@ -77,6 +79,7 @@ volatile float flowrate;
 // Interrupt is called once a millisecond, looks for any pulses from the sensor!
 
 void setup() {
+  //Serial.begin(9600); 
   pinMode(FILLREED, INPUT_PULLUP);
   pinMode(PROXREED, INPUT_PULLUP);
   pinMode(RELAYOUT, OUTPUT);
@@ -89,6 +92,7 @@ void setup() {
 }
 
 void loop(){
+  
   bpStateMachine.update();
 }
  
@@ -102,7 +106,15 @@ void stateFillingEnter()
   pulses = 0;
   lastpulses = 0;
   start_filling_millis = millis();
+  //timerFillExpire.restartTimer(tickEvent);
+  //tickEvent = timerFillExpire.after(MAX_FILL_TIME, fillTimerExpire); 
+  //tickEvent = timerFillExpire.setTimeout(90 * 1000, fillTimerExpire);
 }
+
+//void fillTimerExpire()
+//{
+//  bpStateMachine.transitionTo(stateComplete);
+//}
 
 void stateFillingUpdate()
 { 
