@@ -50,7 +50,32 @@ Using the easy to use Arduino state machine @ http://playground.arduino.cc/Code/
                                                                                            
 </pre>
 
+#### Wiring Diagram
 
+<pre>
+                                         +----------------------------------------+                                     
+         +------------+                  |                                        |                                     
+         |            |                  |                                    J3  +-------------------+A/C IN - L1      
++--------+  Proximity +------------------+ J1 Pin 1                               |                                     
+|        |  Reed SW   |                  |                                        |                                     
+|        +------------+                  |                                    J7  +-------------------+A/C IN - Neutral 
+|                                        |           Controller PCB               |                                     
+|        +------------+                  |                                        |                                     
+|        | Float      |                  |                                        |                                     
++--------+ Reed SW    +------------------+ J1 Pin 2                               |                                     
+|        |            |                  |                                        |                    +---------------+
+|        +------------+                  |                                    J4  +--------------------+               |
+|                                        |                                        |                    |  Water Valve  |
++----------------------------------------+ J1 Pin 4                           J5  +--------------------+               |
+                                         |                                        |                    |               |
+                                         +----------------------------------------+                    +---------------+
 
+</pre>
 
+#### Fuse settings for ATTINY85
+low_fuses=0xe2
+
+high_fuses=0xdf
+
+extended_fuses=0xff
 
