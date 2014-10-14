@@ -3,8 +3,11 @@
 
 | Test ID       | Test Description | Initial Condition | Test Procedure | Expected Results |
 | ------------- | ---------------- | ----------------- | -------------- | ---------------- |
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
+|normal_use_empty|
+|normal_use_full|
+|power_outage_standby|
+|power_outage_filling|
+|power_outage_full|
+
 
 
